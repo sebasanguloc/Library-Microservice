@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: book-service
+
+  datasource:
+    url: jdbc:mysql://localhost:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+  sql:
+    init:
+      mode: always
+
+server:
+  port: 8081
