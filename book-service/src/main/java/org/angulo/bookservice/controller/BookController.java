@@ -1,9 +1,12 @@
 package org.angulo.bookservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.angulo.bookservice.model.dto.BookDto;
 import org.angulo.bookservice.model.dto.ResponseDto;
 import org.angulo.bookservice.service.IBookService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +15,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/books")
