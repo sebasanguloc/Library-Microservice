@@ -1,0 +1,276 @@
+openapi: 3.0.1
+info:
+  title: Book Service
+  description: |
+    A microservice, part of the Project **_Library Microservice_**, is dedicated to managing the registration and information of all books in the library.
+  contact:
+    name: Sebastin Angulo Castellanos
+    url: https://github.com/sebasanguloc
+    email: sebastianangulocastellanos@gmail.com
+  version: 0.0.1
+servers:
+  - url: http://localhost:8081
+    description: |
+      Base URL to test the Book Service API independently.
+tags:
+  - name: GET
+    description: Get endpoints
+  - name: POST
+    description: Post endpoints
+  - name: PATCH
+    description: Patch endpoints
+paths:
+  /books:
+    get:
+      tags:
+        - GET
+      summary: List of all books
+      description: Return the list of all books registered in the library
+      responses:
+        '200':
+          description: A list of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseDto'
+              example:
+                - title: El Padrino
+                  author: Mario Puzo
+                  price: 18.9
+                  stock: 10
+                - title: It
+                  author: Stephen King
+                  price: 25.4
+                  stock: 4
+                - title: La Odisea
+                  author: Homero
+                  price: 15.75
+                  stock: 12
+    post:
+      tags:
+        - POST
+      summary: Add a new book to the registry
+      description: Register a new book in the library and return the registered book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookDto"
+            examples:
+              new-book-01:
+                $ref: '#/components/examples/new-book-01'
+      responses:
+        '201':
+          description: Return the registered book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+              example:
+                httpStatus: CREATED
+                message: Book created succesfully
+                data:
+                  title: Hábitos Atómicos
+                  author: James Clear
+                  price: 50
+                  stock: 2
+  /books/lend:
+    patch:
+      tags:
+        - PATCH
+      summary: Decrease the total stock of a specific book
+      description: |
+        Decrease the total stock of the book passed as a parameter. If the stock reaches 0, raise an exception
+      parameters:
+        - name: title
+          in: query
+          schema:
+            type: string
+          example: Don Quijote
+        - name: quantity
+          in: query
+          schema:
+            type: string
+          example: 10
+      responses:
+        '200':
+          description: |
+            Returns a successful message when the loan process was completed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDto"
+              example:
+                httpStatus: OK
+                message: Stock updated succesfully
+                data:
+                  title: Don Quijote
+                  author: Cervantes
+                  price: 19.99
+                  stock: 20
+  /books/{title}:
+    get:
+      tags:
+        - GET
+      summary: Return the book with that title
+      description: Return the book with the title written in the path
+      parameters:
+        - name: title
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          example: Don Quijote
+      responses:
+        '200':
+          description: Specific book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+              example:
+                httpStatus: OK
+                message: Stock updated succesfully
+                data:
+                  title: Don Quijote
+                  author: Cervantes
+                  price: 19.99
+                  stock: 10
+  /books/{author}:
+    get:
+      tags:
+        - GET
+      summary: Return the book woth that author
+      description: Return the book with the author written in the path
+      parameters:
+        - name: author
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          example: Stephen King
+      responses:
+        '200':
+          description: Books written by the author
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+              example:
+                - title: Hamlet
+                  author: William Shakespeare
+                  price: 18.4
+                  stock: 8
+                - title: Macbeth
+                  author: William Shakespeare
+                  price: 17.1
+                  stock: 10
+                - title: Romeo y Julieta
+                  author: William Shakespeare
+                  price: 16.8
+                  stock: 12
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        price:
+          type: number
+          format: double
+          minimum: 1
+        stock:
+          type: integer
+          format: int32
+          minimum: 1
+      required: [title]
+    BookDto:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        price:
+          type: number
+          format: double
+          minimum: 1
+        stock:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            If the book exists, the stock passed in the request body is added to the existing stock **_(POST)_**.
+      required: [title]
+    ResponseDto:
+      type: object
+      properties:
+        httpStatus:
+          type: string
+          enum: [OK, CREATED, NOT_FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR]
+        message:
+          type: string
+        data:
+          allOf:
+            - $ref: '#/components/schemas/BookDto'
+          nullable: true
+  examples:
+    all-books:
+      summary: Books 01
+      value:
+        - title: El Padrino
+          author: Mario Puzo
+          price: 18.9
+          stock: 10
+        - title: It
+          author: Stephen King
+          price: 25.4
+          stock: 4
+        - title: La Odisea
+          author: Homero
+          price: 15.75
+          stock: 12
+        - title: El Quijote
+          author: Cervantes
+          price: 19.99
+          stock: 10
+    new-book-01:
+      summary: Book 01
+      value:
+        - title: Hábitos Atómicos
+          author: James Clear
+          price: 50
+          stock: 2
+    response-new-book-01:
+      summary: New Book 01
+      value:
+        - httpStatus: CREATED
+          message: Book created succesfully
+          data:
+            title: Hábitos Atómicos
+            author: James Clear
+            price: 50
+            stock: 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

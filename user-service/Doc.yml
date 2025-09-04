@@ -1,0 +1,223 @@
+openapi: 3.0.1
+info:
+  title: User Service
+  description: |
+    A microservice, part of the Project **_Library Microservice_**, is dedicated to managing the registration and information of all users in the library.
+  contact:
+    name: Sebastin Angulo Castellanos
+    url: https://github.com/sebasanguloc
+    email: sebastianangulocastellanos@gmail.com
+  version: 0.0.1
+servers:
+  - url: http://localhost:8082
+    description: |
+      Base URL to test the Book Service API independently.
+tags:
+  - name: GET
+    description: Get endpoints
+  - name: POST
+    description: Post endpoints
+  - name: PUT
+    description: Patch endpoints
+  - name: DELETE
+    description: Delete endpoints
+paths:
+  /users:
+    get:
+      tags:
+        - GET
+      summary: List of users
+      description: Return a list off all users registered.
+      responses:
+        '200':
+          description: Return a list off all users registered.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDto"
+                example:
+                  - firstname: Sebastian
+                    lastName: Angulo
+                    email: sebas@correo.com
+                    phone: 3196611933
+                    dateOfBirth: 2004-08-11
+                    address: Bogota, Colombia
+                  - firstname: Lionel
+                    lastName: Messi
+                    email: messi@correo.com
+                    phone: 319000000
+                    dateOfBirth: 2000-08-11
+                    address: Rosario, Argentina
+    post:
+      tags:
+        - POST
+      summary: Creation of user
+      description: Create user and returns the user created.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDto"
+            example:
+              firstName: Lionel
+              lastName: Messi
+              email: messi@correo.com
+              phone: 319000000
+              dateOfBirth: 2000-08-11
+              address: Rosario, Argentina
+      responses:
+        '201':
+          description: Creation of user successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDto"
+              example:
+                httpStatus: CREATED
+                message: User created successfully
+                data:
+                  firstName: Lionel
+                  lastName: Messi
+                  email: messi@correo.com
+                  phone: 319000000
+                  dateOfBirth: 2000-08-11
+                  address: Rosario, Argentina
+    put:
+      tags:
+        - PUT
+      summary: Update user by ID
+      description: Update user and return the user updated
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+            format: UUID
+          example: 59357901-a97e-4055-98c1-01b4196ac1e9
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDto"
+            example:
+              firstName: Neymar
+              lastName: Junior
+              email: neymar@correo.com
+              phone: 319000001
+              dateOfBirth: 2000-08-11
+              address: Rio, Brasil
+      responses:
+        '201':
+          description: Update of user successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDto"
+              example:
+                httpStatus: OK
+                message: User updated successfully
+                data:
+                  firstName: Neymar
+                  lastName: Junior
+                  email: neymar@correo.com
+                  phone: 319000001
+                  dateOfBirth: 2000-08-11
+                  address: Rio, Brasil
+    delete:
+      tags:
+        - DELETE
+      summary: Delete user by email
+      description: Delete user by email and return null in the data attribute
+      parameters:
+        - name: email
+          in: query
+          schema:
+            type: string
+            format: email
+          example: neymar@correo.com
+      responses:
+        '200':
+          description: Delete user by email and return null in the data attribute
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDto"
+              example:
+                httpStatus: OK
+                message: User deleted successfully
+                data: null
+  /users/{email}:
+    get:
+      tags:
+        - GET
+      summary: User by email
+      description: Return user details by email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+          example: sebas@correo.com
+      responses:
+        '200':
+          description: Return user details by email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDto"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: UUID
+        firstname:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        address:
+          type: string
+    UserDto:
+      type: object
+      properties:
+        firstname:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        address:
+          type: string
+    ResponseDto:
+      type: object
+      properties:
+        httpStatus:
+          type: string
+          enum: [OK, CREATED, NOT_FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR]
+        message:
+            type: string
+        data:
+          type: object
+          anyOf:
+            - $ref: "#/components/schemas/UserDto"
+          nullable: true
+
