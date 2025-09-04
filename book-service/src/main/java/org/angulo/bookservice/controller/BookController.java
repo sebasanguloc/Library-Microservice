@@ -68,7 +68,7 @@ public class BookController {
         return ResponseEntity.status(CREATED).body(response);
     }
 
-    @PatchMapping("/lend")
+    @PutMapping("/lend")
     public ResponseEntity<?> decreaseStockOfBooks(@RequestParam String title, @RequestParam Integer quantity){
         bookService.decreaseStockByTitle(title,quantity);
         BookDto bookUpdated = bookService.findByTitle(title);

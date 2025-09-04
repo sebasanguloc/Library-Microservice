@@ -14,5 +14,12 @@ spring:
           clone-on-start: true
           force-pull: true
 
+info:
+  app:
+    name: "order-service"
+    description: "Library order-service application"
+    version: "0.0.1"
+
+
 server:
   port: 8071
