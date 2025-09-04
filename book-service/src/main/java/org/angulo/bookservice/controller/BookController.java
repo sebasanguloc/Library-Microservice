@@ -19,7 +19,6 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/books")
-@CrossOrigin(origins = "http://localhost:8080")
 public class BookController {
 
     private final IBookService bookService;

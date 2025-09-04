@@ -1,6 +1,8 @@
 package org.angulo.orderservice.service.Impl;
 
+import jakarta.ws.rs.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.angulo.orderservice.Exception.InsufficientBooksException;
 import org.angulo.orderservice.constant.Status;
 import org.angulo.orderservice.model.Order;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class OrderServiceImpl implements IOrderService {
@@ -31,17 +35,19 @@ public class OrderServiceImpl implements IOrderService {
             Integer quantity = bookOrderDto.getQuantity();
 
             ResponseEntity<ResponseDto<BookDto>> bookResponse = bookFeignClient.getBookByTitle(title);
-            Integer stock = bookResponse.getBody().getData().getStock();
-            if(stock < quantity) throw new InsufficientBooksException("Insufficient number of books");
+            Integer stock;
+            if(bookResponse != null){
+                stock = bookResponse.getBody().getData().getStock();
+                if(stock < quantity) throw new InsufficientBooksException("Insufficient number of books");
+                bookFeignClient.decreaseStockOfBooks(title,quantity);
+            }
 
-            bookFeignClient.decreaseStockOfBooks(title,quantity);
         });
         Order order = new Order(
                 orderRequestDto.getUserEmail(),
                 Status.PENDING.toString()
         );
         Order newOrder = orderRepository.save(order);
-
 
         OrderItem orderItem = new OrderItem();
 
