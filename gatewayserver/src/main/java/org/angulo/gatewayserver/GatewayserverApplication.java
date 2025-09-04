@@ -23,22 +23,40 @@ public class GatewayserverApplication {
                 .route(p -> p
                         .path("/api/book-service/**")
                         .filters( f -> f.rewritePath("/api/book-service/(?<segment>.*)","/${segment}")
-                                .circuitBreaker(config -> config.setName("bookServiceCircuitBreaker")
+                                .circuitBreaker(config -> config
+                                        .setName("bookServiceCircuitBreaker")
                                         .setFallbackUri("forward:/support"))
+                                .retry(retryConfig -> retryConfig
+                                        .setRetries(3)
+                                        .setMethods(HttpMethod.GET)
+                                        .setBackoff(Duration.ofMillis(100),Duration.ofMillis(1000),2,true)
+                                )
                         )
                         .uri("lb://BOOK-SERVICE"))
                 .route(p -> p
                         .path("/api/user-service/**")
                         .filters( f -> f.rewritePath("/api/user-service/(?<segment>.*)","/${segment}")
-                                .circuitBreaker(config -> config.setName("userServiceCircuitBreaker")
+                                .circuitBreaker(config -> config
+                                        .setName("userServiceCircuitBreaker")
                                         .setFallbackUri("forward:/support"))
+                                .retry(retryConfig -> retryConfig
+                                        .setRetries(3)
+                                        .setMethods(HttpMethod.GET)
+                                        .setBackoff(Duration.ofMillis(100),Duration.ofMillis(1000),2,true)
+                                )
                         )
                         .uri("lb://USER-SERVICE"))
                 .route(p -> p
                         .path("/api/order-service/**")
                         .filters( f -> f.rewritePath("/api/order-service/(?<segment>.*)","/${segment}")
-                                .circuitBreaker(config -> config.setName("orderServiceCircuitBreaker")
+                                .circuitBreaker(config -> config
+                                        .setName("orderServiceCircuitBreaker")
                                         .setFallbackUri("forward:/support"))
+                                .retry(retryConfig -> retryConfig
+                                        .setRetries(3)
+                                        .setMethods(HttpMethod.GET)
+                                        .setBackoff(Duration.ofMillis(100),Duration.ofMillis(1000),2,true)
+                                )
                         )
                         .uri("lb://ORDER-SERVICE"))
                 .build();

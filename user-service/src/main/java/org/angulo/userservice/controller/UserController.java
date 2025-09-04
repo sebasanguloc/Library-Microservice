@@ -1,6 +1,7 @@
 package org.angulo.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.angulo.userservice.model.dto.ResponseDto;
 import org.angulo.userservice.model.dto.UserDto;
 import org.angulo.userservice.service.IUserService;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
@@ -21,6 +23,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<ResponseDto<List<UserDto>>> getAllUsers(){
+        log.info("Testing retry pattern");
         List<UserDto> users = userService.findAllUsers();
         ResponseDto<List<UserDto>> response = new ResponseDto<>(
                 OK,

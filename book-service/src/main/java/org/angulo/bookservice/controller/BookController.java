@@ -25,6 +25,7 @@ public class BookController {
 
     @GetMapping
     public ResponseEntity<ResponseDto<List<BookDto>>> getAllBooks(){
+        log.info("Testing retry pattern");
         List<BookDto> books = bookService.findAll();
         ResponseDto<List<BookDto>> response = new ResponseDto<>(
                 OK,
