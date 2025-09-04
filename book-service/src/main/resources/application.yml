@@ -9,11 +9,29 @@ spring:
     username: "guest"
     password: "guest"
 
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: "http://localhost:8070/eureka/"
+
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "book-service"
+    description: "Library book-service application"
+    version: "0.0.1"
 
 server:
   port: 8081

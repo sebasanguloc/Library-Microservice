@@ -4,11 +4,30 @@ spring:
   config:
     import: "optional:configserver:http://localhost:8071/"
 
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8070/eureka/
+
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "user-service"
+    description: "Library user-service application"
+    version: "0.0.1"
 
 server:
   port: 8082
+
