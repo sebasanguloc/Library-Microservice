@@ -2,7 +2,7 @@ spring:
   application:
     name: gatewayserver
   config:
-    import: "optional:${CONFIGSERVER_IMPORT}"
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8071/}
   cloud:
     gateway:
       server:
@@ -20,6 +20,11 @@ spring:
       host: localhost
       port: 6379
       timeout: 1s
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://authserver:9000/oauth2/jwks
 
 management:
   endpoints:

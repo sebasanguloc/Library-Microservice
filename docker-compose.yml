@@ -29,6 +29,30 @@ services:
     networks:
       - libraryMs
 
+  ## MySQL - AuthServer
+  authdb:
+    image: mysql
+    container_name: authdb
+    ports:
+      - "3308:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD_AUTH}
+      MYSQL_DATABASE: ${MYSQL_DATABASE_AUTH}
+      MYSQL_USER: ${MYSQL_USER_AUTH}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD_AUTH}
+    networks:
+      - libraryMs
+
   ## MySQL - Book-service
   booksdb:
     image: mysql
@@ -44,7 +68,6 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-
     deploy:
       resources:
         limits:
@@ -125,6 +148,7 @@ services:
     networks:
       - libraryMs
 
+  ## Eurekaserver
   eurekaserver:
     image: "sebasanguloc/eurekaserver:v1"
     container_name: eurekaserver
@@ -145,7 +169,7 @@ services:
           memory: 700m
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"
-      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071/"
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
     networks:
       - libraryMs
 
@@ -177,7 +201,7 @@ services:
       SPRING_APPLICATION_NAME: "book-service"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
       SPRING_DATASOURCE_URL: "jdbc:mysql://booksdb:3306/${MYSQL_DATABASE}"
-      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071/"
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
     networks:
@@ -210,7 +234,7 @@ services:
       SPRING_APPLICATION_NAME: "user-service"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://usersdb:5432/${POSTGRES_DB}"
-      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071/"
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
@@ -243,9 +267,36 @@ services:
       SPRING_APPLICATION_NAME: "order-service"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://ordersdb:5432/${POSTGRES_ORDER_DB}"
-      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071/"
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_ORDER_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_ORDER_PASSWORD}
+    networks:
+      - libraryMs
+
+  ## Authserver
+  authserver:
+    image: "sebasanguloc/authserver:v1"
+    container_name: authserver
+    healthcheck:
+      test: "curl --fail --silent localhost:9000/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      authdb:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    ports:
+      - "9000:9000"
+    environment:
+      SPRING_APPLICATION_NAME: "authserver"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://authdb:3306/${MYSQL_DATABASE_AUTH}"
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER_AUTH}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD_AUTH}
     networks:
       - libraryMs
 
@@ -271,7 +322,8 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
-      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071/"
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWT_SET_URI: http://authserver:9000/oauth2/jwks
       SPRING_DATA_REDIS_CONNECT_TIMEOUT: 2s
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
