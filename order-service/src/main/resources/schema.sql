@@ -1,6 +1,5 @@
-
-DROP  TABLE order_items;
-DROP  TABLE orders;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
 
 CREATE TABLE orders (
                         id BIGSERIAL PRIMARY KEY,
