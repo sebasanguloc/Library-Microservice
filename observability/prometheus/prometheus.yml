@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 5s # Set the scrape interval to every 5 seconds.
+  evaluation_interval: 5s # Evaluate rules every 5 seconds.
+
+scrape_configs:
+  - job_name: 'userservice'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'usersservice:8082' ]
+
+  - job_name: 'bookservice'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'bookservice:8081' ]
+
+  - job_name: 'orderservice'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'ordersservice:8083' ]
+
+  - job_name: 'gatewayserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'gatewayserver:8080' ]
+
+  - job_name: 'eurekaserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'eurekaserver:8070' ]
+
+  - job_name: 'configserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'configserver:8071' ]
+
+  - job_name: 'authserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'authserver:9001' ]
+

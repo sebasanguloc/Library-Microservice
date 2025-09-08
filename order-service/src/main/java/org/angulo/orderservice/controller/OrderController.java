@@ -23,13 +23,14 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<ResponseDto<OrderDto>> createOrder(@RequestBody OrderRequestDto orderRequestDto){
+        log.debug("B - CREATING ORDER - ORDER_SERVICE -");
         OrderDto order = orderService.createOrder(orderRequestDto);
         ResponseDto<OrderDto> response = new ResponseDto<>(
                 HttpStatus.CREATED,
                 "Order created successfully",
                 order
         );
-
+        log.debug("E - CREATING ORDER - ORDER_SERVICE -");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

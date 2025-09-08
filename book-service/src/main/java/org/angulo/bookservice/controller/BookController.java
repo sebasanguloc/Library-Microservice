@@ -37,12 +37,14 @@ public class BookController {
 
     @GetMapping("/{title}")
     public ResponseEntity<ResponseDto<BookDto>> getBookByTitle(@PathVariable String title){
+        log.debug("B - SEARCHING BOOK - BOOK_SERVICE -");
         BookDto book = bookService.findByTitle(title);
         ResponseDto<BookDto> response = new ResponseDto<>(
             OK,
                 "Book by title",
                 book
         );
+        log.debug("E - SEARCHING BOOK - BOOK_SERVICE -");
         return ResponseEntity.status(OK).body(response);
     }
 
@@ -70,6 +72,7 @@ public class BookController {
 
     @PutMapping("/lend")
     public ResponseEntity<?> decreaseStockOfBooks(@RequestParam String title, @RequestParam Integer quantity){
+        log.debug("B - DECREASING STOCK BOOK - BOOK_SERVICE -");
         bookService.decreaseStockByTitle(title,quantity);
         BookDto bookUpdated = bookService.findByTitle(title);
         ResponseDto<?> response = new ResponseDto<>(
@@ -77,6 +80,7 @@ public class BookController {
                 "Books leaded successfully",
                 bookUpdated
         );
+        log.debug("E - DECREASING STOCK BOOK - BOOK_SERVICE -");
         return  ResponseEntity.status(OK).body(response);
     }
 }
