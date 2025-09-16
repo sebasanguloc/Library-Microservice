@@ -16,7 +16,8 @@ public interface IUserRepository extends JpaRepository<User, UUID> {
 
     /* CRUD */
 
-    // READ
+    Optional<User> findUserByPhone(String phone);
+
     @Query("SELECT new org.angulo.userservice.model.dto.UserDto(u.firstName, u.lastName, u.email, u.phone, u.dateOfBirth, u.address) FROM User u")
     List<UserDto> findAllUsers();
 

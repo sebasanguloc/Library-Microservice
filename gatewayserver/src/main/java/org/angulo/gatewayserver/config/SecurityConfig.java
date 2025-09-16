@@ -22,7 +22,13 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity){
         serverHttpSecurity.authorizeExchange(exchanges ->
                 exchanges
-                        .pathMatchers("/actuator/**").permitAll()
+                        .pathMatchers(
+                                "/actuator/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
                         .pathMatchers("/api/user-service/**").hasRole("ADMIN")
                         .pathMatchers("/api/book-service/**").hasAnyRole("ADMIN","USER")
                         .pathMatchers("/api/order-service/**").hasRole("USER")

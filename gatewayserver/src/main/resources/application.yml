@@ -24,7 +24,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://authserver:9001/oauth2/jwks
+          jwk-set-uri: ${URL_TOKEN_JWKS:http://authserver:9001/oauth2/jwks}
 
 management:
   endpoints:

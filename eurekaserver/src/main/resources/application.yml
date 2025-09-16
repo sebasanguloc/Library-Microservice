@@ -28,3 +28,6 @@ logging:
   level:
     org:
       angulo: debug
+
+server:
+  port: 8070

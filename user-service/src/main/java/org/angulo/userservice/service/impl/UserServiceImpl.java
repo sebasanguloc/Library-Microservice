@@ -2,6 +2,7 @@ package org.angulo.userservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.angulo.userservice.Exception.UserNotFoundException;
 import org.angulo.userservice.model.User;
 import org.angulo.userservice.model.dto.UserDto;
 import org.angulo.userservice.repository.IUserRepository;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDto findUserByEmail(String email) {
         return userRepository.findUserByEmail(email)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Override

@@ -1,0 +1,443 @@
+openapi: 3.0.1
+info:
+  title: Library Microservice API
+  description: |
+    API documentation for all endpoints routed by the **Edge Server**, including security via **_OAuth2/OpenID-Connect_** following the *Authorization Code Grant Type Flow*.
+  contact:
+    name: Sebastian Angulo Castellanos
+    url: https://github.com/sebasanguloc
+    email: sebasanguloc@gmail.com
+  version: 1.0.0
+servers:
+  - description: Url book-service endpoints
+    url: http://localhost:8080/api/book-service
+  - description: Url user-service endpoints
+    url: http://localhost:8080/api/user-service/
+  - description: Url order-service endpoints
+    url: http://localhost:8080/api/order-service
+  - description: Url book-service without Edge Server
+    url: http://localhost:8081
+  - description: Url user-service without Edge Server
+    url: http://localhost:8082
+  - description: Url order-service without Edge Server
+    url: http://localhost:8083
+tags:
+  - name: Book-Service
+  - name: User-Service
+  - name: Order-Service
+paths:
+  /books:
+    get:
+      summary: get all books registered
+      tags:
+        - Book-Service
+      responses:
+        '200':
+          description: Get all books registered in library
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookDto"
+                example:
+                  - title: El Padrino
+                    author: Mario Puzo
+                    price: 18.9
+                    stock: 10
+                  - title: It
+                    author: Stephen King
+                    price: 25.4
+                    stock: 4
+                  - title: La Odisea
+                    author: Homero
+                    price: 15.75
+                    stock: 12
+    post:
+      summary: register book in the library
+      tags:
+        - Book-Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResponseBookDto"
+            example:
+              title: New Book
+              author: New Author
+              price: 19.99
+              stock: 10
+      responses:
+        '201':
+          description: Book registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseBookDto"
+              example:
+                httpStatus: CREATED
+                message: Book created successfully
+                data:
+                  title: New Book
+                  author: New Author
+                  price: 19.99
+                  stock: 10
+  /books/{title}:
+    get:
+      summary: get book by title
+      tags:
+        - Book-Service
+      parameters:
+        - name: title
+          in: path
+          required: true
+          example: El Quijote
+      responses:
+        '200':
+          description: Get book by title
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseBookDto"
+              example:
+                httpStatus: OK
+                message: Book by title
+                data:
+                  title: El Quijote
+                  author: Cervantes
+                  price: 19.99
+                  stock: 10
+  /books/author:
+    get:
+      summary: get all books by author
+      tags:
+        - Book-Service
+      parameters:
+        - name: name
+          in: query
+          required: true
+          example: William Shakespeare
+      responses:
+        '200':
+          description: Get book by author
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookDto"
+              example:
+                - title: Hamlet
+                  author: William Shakespeare
+                  price: 18.4
+                  stock: 8
+                - title: Romeo y Julieta
+                  author: William Shakespeare
+                  price: 16.8
+                  stock: 12
+  /users:
+    get:
+      summary: get all registered users
+      tags:
+        - User-Service
+      responses:
+        '200':
+          description: Get all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResponseUserDto"
+              example:
+                - firstName: Valentina
+                  lastname: Rojas
+                  email: valen.r@email.com
+                  phone: 3205551234
+                  dateOfBirth: 1998-07-22
+                  address: Carrera 7, Bogotá
+                - firstName: Ricardo
+                  lastname: Páez
+                  email: ricardo.p@email.com
+                  phone: 3133334455
+                  dateOfBirth: 1987-02-09
+                  address: Carrera 15, Pereira
+    post:
+      summary: register new user
+      tags:
+        - User-Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDto"
+            example:
+              firstName: name 01
+              lastName: lastname 02
+              email: newuser@email.com
+              phone: 111111111
+              dateOfBirth: 2004-08-11
+              address: New direction
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseUserDto"
+              example:
+                httpStatus: CREATED
+                message: User created successfully
+                data:
+                  firstName: name 01
+                  lastName: lastname 02
+                  email: newuser@email.com
+                  phone: 111111111
+                  dateOfBirth: 2004-08-11
+                  address: New direction
+    put:
+      summary: update registered user
+      tags:
+        - User-Service
+      parameters:
+        - name: id
+          in: query
+          required: true
+          example: 46b4a0a2-1292-49f6-b18a-7a07b5b86ce9
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDto"
+            example:
+              firstName: name updated
+              lastName: lastname updated
+              email: updateduser@email.com
+              phone: 222222222
+              dateOfBirth: 2004-08-11
+              address: updated direction
+      responses:
+        '200':
+          description: Update user by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseUserDto"
+              example:
+                httpStatus: OK
+                message: User updated successfully
+                data:
+                  firstName: name updated
+                  lastName: lastname updated
+                  email: updateduser@email.com
+                  phone: 222222222
+                  dateOfBirth: 2004-08-11
+                  address: updated direction
+    delete:
+      summary: delete registered user
+      tags:
+        - User-Service
+      parameters:
+        - name: email
+          in: query
+          required: true
+          example: carlos.lopez@email.com
+      responses: 
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseUserDto"
+              example:
+                httpStatus: OK
+                message: User deleted successfully
+                data: null
+  /users/{email}:
+    get:
+      summary: get user by email
+      tags:
+        - User-Service
+      parameters:
+        - name: email
+          in: path
+          required: true
+          example: sebas@correo.com
+      responses:
+        '200':
+          description: Get user by email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseUserDto"
+              example:
+                firstName: Sebastian
+                lastName: Angulo
+                phone: 3200000000
+                email: sebas@coreo.com
+                dateOfBirth: 2004-12-13
+                address: Gran Granada, Bogota
+  /orders:
+    post:
+      summary: user reserves books from the library
+      tags:
+        - Order-Service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderRequestDto"
+            example:
+              userEmail: carlos.lopez@email.com
+              items:
+                - title: La Odisea
+                  quantity: 3
+                - title: 1984
+                  quantity: 1
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseOrderDto"
+              example:
+                httpStatus: CREATED
+                message: Order created successfully
+                data:
+                  userEmail: carlos.lopez@email.com
+                  status: PENDING
+                  createdAt: 2025-09-16T22:32:20.710Z
+components:
+  schemas:
+    ResponseBookDto:
+      type: object
+      properties:
+        httpStatus:
+          type: string
+          enum: [OK, CREATED, NOT_FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR]
+        message:
+          type: string
+        data:
+          allOf:
+            - $ref: '#/components/schemas/BookDto'
+          nullable: true
+    ResponseUserDto:
+      type: object
+      properties:
+        httpStatus:
+          type: string
+          enum: [ OK, CREATED, NOT_FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR ]
+        message:
+          type: string
+        data:
+          allOf:
+            - $ref: '#/components/schemas/UserDto'
+          nullable: true
+    UserDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastname:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        address:
+          type: string
+    BookDto:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        price:
+          type: number
+          format: double
+          minimum: 1
+        stock:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            If the book exists, the stock passed in the request body is added to the existing stock **_(POST)_**.
+      required: [title]
+    BookOrderDto:
+      type: object
+      properties:
+        title:
+          type: string
+        quantity:
+          type: integer
+      required: [title, quantity]
+    OrderRequestDto:
+      type: object
+      properties:
+        userEmail:
+          type: string
+        "items":
+          type: array
+          items:
+            $ref: "#/components/schemas/BookOrderDto"
+    OrderDto:
+      type: object
+      properties:
+        userEmail:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    ResponseOrderDto:
+      type: object
+      properties:
+        httpStatus:
+          type: string
+          enum: [OK, CREATED, NOT_FOUND, BAD_REQUEST, INTERNAL_SERVER_ERROR]
+        message:
+          type: string
+        data:
+          allOf:
+            - $ref: "#/components/schemas/OrderDto"
+          nullable: true
+  examples:
+    all-books:
+      summary: Books 01
+      value:
+        - title: El Padrino
+          author: Mario Puzo
+          price: 18.9
+          stock: 10
+        - title: It
+          author: Stephen King
+          price: 25.4
+          stock: 4
+        - title: La Odisea
+          author: Homero
+          price: 15.75
+          stock: 12
+        - title: El Quijote
+          author: Cervantes
+          price: 19.99
+          stock: 10
+    book_01:
+      httpStatus: OK
+      message: Book by title
+      data:
+        title: El Quijote
+        author: Cervantes
+        price: 19.99
+        stock: 10
+
+
+
+
+
+
